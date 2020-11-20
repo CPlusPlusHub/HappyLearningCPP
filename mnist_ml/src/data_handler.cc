@@ -197,5 +197,5 @@ int main(){
     dh->read_feature_vector("../mnist_data/t10k-images-idx3-ubyte");
     dh->read_feature_labels("../mnist_data/t10k-labels-idx1-ubyte");
     dh->split_data();
-    dh->count_classes();
+    dh->count_classes(); 
 }
