@@ -85,13 +85,12 @@ void data_handler::read_feature_labels(std::string path){
     //    printf("flag mmmm\n");
        printf("Successfully read and stored %lu labels\n",data_array->size());
        
-       printf("flag"); 
+    //    printf("flag"); 
    }else{
        printf("Could not find file.\n");
        exit(1);
    }
    fclose(f);
-   printf("flag1");
 }
 
 void data_handler::split_data(){
@@ -99,37 +98,59 @@ void data_handler::split_data(){
     int train_size = this->data_array->size() * TRAINING_SET_PERCENT;
     int test_size = this->data_array->size() * TEST_SET_PERCENT;
     int validation_size = this->data_array->size() * VALIDATION_SET_PERCENT;
-
-    int count = 0;
-    while(count < train_size)
-    {
-        int rand_index =  rand() % data_array->size();
-        if(used_indexes.find(rand_index) == used_indexes.end()){
-            training_data->push_back(data_array->at(rand_index));
-            used_indexes.insert(rand_index);
-            count++;
+    
+    auto rng = std::default_random_engine{};
+    // auto head = data_array->at(0);
+    std::shuffle(data_array->begin(),data_array->end(), rng);
+    // auto head_shuffle = data_array->at(0);
+    
+    // if(head_shuffle != head){
+    //     printf("flag shuffle");
+    // }
+    for(size_t i = 0; i < this->data_array->size(); i++){
+        if(i < train_size){
+            // training data 
+            this->training_data->push_back(data_array->at(i));
+        }
+        else if(i < train_size + test_size){
+            // test data
+            this->test_data->push_back(data_array->at(i));
+        }
+        else{
+            // validation data
+            this->validation_data->push_back(data_array->at(i));
         }
     }
+    // int count = 0;
+    // while(count < train_size)
+    // {
+    //     int rand_index =  rand() % data_array->size();
+    //     if(used_indexes.find(rand_index) == used_indexes.end()){
+    //         training_data->push_back(data_array->at(rand_index));
+    //         used_indexes.insert(rand_index);
+    //         count++;
+    //     }
+    // }
 
-    count = 0;
-    while(count < test_size){
-        int rand_index = rand() % data_array->size();
-        if(used_indexes.find(rand_index) == used_indexes.end()){
-            test_data->push_back(data_array->at(rand_index));
-            used_indexes.insert(rand_index);
-            count++;
-        }
-    }
+    // count = 0;
+    // while(count < test_size){
+    //     int rand_index = rand() % data_array->size();
+    //     if(used_indexes.find(rand_index) == used_indexes.end()){
+    //         test_data->push_back(data_array->at(rand_index));
+    //         used_indexes.insert(rand_index);
+    //         count++;
+    //     }
+    // }
 
-    count = 0;
-    while(count < test_size){
-        int rand_index = rand() % data_array->size();
-        if(used_indexes.find(rand_index) == used_indexes.end()){
-            validation_data->push_back(data_array->at(rand_index));
-            used_indexes.insert(rand_index);
-            count++;
-        }
-    }
+    // count = 0;
+    // while(count < test_size){
+    //     int rand_index = rand() % data_array->size();
+    //     if(used_indexes.find(rand_index) == used_indexes.end()){
+    //         validation_data->push_back(data_array->at(rand_index));
+    //         used_indexes.insert(rand_index);
+    //         count++;
+    //     }
+    // }
 
     printf("Training Data Size : %lu.\n", this->training_data->size());
     printf("Test Data Size : %lu.\n", this->test_data->size());
@@ -175,8 +196,6 @@ int main(){
     data_handler *dh =  new data_handler();
     dh->read_feature_vector("../mnist_data/t10k-images-idx3-ubyte");
     dh->read_feature_labels("../mnist_data/t10k-labels-idx1-ubyte");
-    printf("flag\n");
-    exit(1);
     dh->split_data();
     dh->count_classes();
 }

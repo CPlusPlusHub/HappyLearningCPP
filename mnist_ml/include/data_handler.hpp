@@ -9,6 +9,8 @@
 #include <map>
 #include <unordered_set>
 #include <string>
+#include <random>
+#include <algorithm>
 
 class data_handler{
 
