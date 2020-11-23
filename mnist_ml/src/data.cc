@@ -38,3 +38,11 @@ uint8_t data::get_enumerate_label(){
 std::vector<uint8_t> * data::get_feature_vector(){
     return this->feature_vector;
 }
+
+void data::set_distance(double val){
+    distance = val;
+}
+
+double data::get_distance(){
+    return distance;
+}
