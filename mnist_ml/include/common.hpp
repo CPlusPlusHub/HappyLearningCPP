@@ -2,7 +2,6 @@
 #define __COMMON_HPP
 #include "data.hpp"
 #include <vector>
-
 class common_data
 {
 private:
@@ -31,6 +30,5 @@ common_data::~common_data()
 {
     
 }
-
 
 #endif
