@@ -192,6 +192,40 @@ uint32_t data_handler::convert_to_little_endian(const unsigned char * bytes){
     );
 }
 
+void data_handler::normalize(){
+    std::vector<uint8_t> min, max;
+    //initialize min and max
+    auto item = this->data_array->at(0);
+    for(int i = 0; i < item->get_feature_vector_size(); i++){
+        min.push_back(item->get_feature_vector()->at(i));
+        max.push_back(item->get_feature_vector()->at(i));
+    }
+
+    for(auto item: *this->data_array){
+        for(int j = 0; j < item->get_feature_vector_size(); j++){
+            uint8_t t = item->get_feature_vector()->at(j);
+            if(t > max.at(j)){
+                max.at(j) = t;
+            }
+            else if (t < min.at(j)){
+                min.at(j) = t;
+            }
+        }
+    }
+    
+    for(auto item: *this->data_array){
+        item->set_normalized_feature_vector(new std::vector<double>());
+        item->set_class_vector(item->get_label());
+        for(int j = 0; j< item->get_feature_vector_size(); j++){
+            if(max[j] - min[j] == 0) item->get_normalized_feature_vector()->push_back(0.0);
+            else{
+                double a = (double) (item->get_feature_vector()->at(j) - min.at(j)) / (max.at(j) - min.at(j));
+                item->get_normalized_feature_vector()->push_back(a);
+            }
+        }
+    }
+}
+
 int main(){
     data_handler *dh =  new data_handler();
     dh->read_feature_vector("../mnist_data/t10k-images-idx3-ubyte");

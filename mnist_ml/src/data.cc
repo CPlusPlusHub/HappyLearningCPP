@@ -46,3 +46,29 @@ void data::set_distance(double val){
 double data::get_distance(){
     return distance;
 }
+
+std::vector<double> * data::get_normalized_feature_vector(){
+    return this->normalized_feature_vector;
+}
+
+void data::set_normalized_feature_vector(std::vector<double> * val){
+    this->normalized_feature_vector = val;
+}
+
+void data::set_class_vector(int classCount){
+    this->class_vector = new std::vector<int>();
+    for(int i = 0; i < classCount; i++){
+        if(i == label){
+            this->class_vector->push_back(1);
+        }
+        else{
+            this->class_vector->push_back(0);
+        }
+    }
+}
+
+std::vector<int>* data::get_class_vector(){
+    return this->class_vector;
+}
+
+
