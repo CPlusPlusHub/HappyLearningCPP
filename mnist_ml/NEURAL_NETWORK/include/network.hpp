@@ -6,7 +6,7 @@
 #include "layer.hpp"
 #include "common.hpp"
 
-class Network
+class Network : public common_data
 {
 private:
     /* data */
