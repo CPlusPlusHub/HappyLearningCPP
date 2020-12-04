@@ -1,7 +1,8 @@
 CC = g++
-MNIST_ML_ROOT := /Users/e1ixir/vscodeProject/MLC/mnist_ml
-SRC := $(MNIST_ML_ROOT)/KNN/src
-INLUCDE_DIR := $(MNIST_ML_ROOT)/KNN/include
+PROJECT_ROOT := $(shell pwd)
+MNIST_ML_ROOT := $(PROJECT_ROOT)/..
+SRC := $(PROJECT_ROOT)/src
+INLUCDE_DIR := $(PROJECT_ROOT)/include
 CFLAGS := -std=c++11 -D EUCLID
 
 all : main
