@@ -16,7 +16,11 @@ Network::Network(std::vector<int> spec, int inputSize, int numClasses, double le
     this->learningRate = learningRate;
 }
 
-Network:: ~Network(){
+Network::~Network(){
+
+}
+
+Network::Network(){
 
 }
 
@@ -102,11 +106,11 @@ int Network::predict(data * d){
 void Network::train(int epoches){
     for(int epoch = 0 ; epoch < epoches; epoch++){
         double sumLoss = 0.0;
-        for(data* d: *this->training_data){
+        for(data* d: *training_data){
             std::vector<double> output = this->fprop(d);
             std::vector<int> expected = *d->get_class_vector();
             double loss = 0.0;
-            for(int i = 0; i < expected.size(); i++){
+            for(int i = 0; i < output.size(); i++){
                 loss += 0.5 * pow(output.at(i) - (double)expected.at(i), 2);
             }
             sumLoss += loss;
@@ -147,5 +151,22 @@ void Network::validate(){
 }
 
 int main(){
-    
+    data_handler *dh = new data_handler();
+    dh->read_feature_vector("../../mnist_data/t10k-images-idx3-ubyte");
+    dh->read_feature_labels("../../mnist_data/t10k-labels-idx1-ubyte");
+    dh->count_classes(); 
+    dh->split_data();
+    std::vector<int> spec = {128,32};
+    int inputSize = dh->get_feature_vector_size();
+    int numClasses = dh->get_num_classes();
+    double learningRate = 0.0001;
+    printf("numClasses: %d inputSize:%d \n",numClasses,inputSize);
+    Network * network = new Network(spec, inputSize, numClasses, learningRate);
+    network->set_training_data(dh->get_training_data());
+    network->set_validation_data(dh->get_validation_data());
+    network->set_test_data(dh->get_test_data());
+    network->train(100);
+    network->validate();
+    printf("Test Performance: %.3f\n", network->test());
+    return 0;
 }

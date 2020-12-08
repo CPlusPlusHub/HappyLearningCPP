@@ -13,6 +13,7 @@ private:
 public:
     Network(std::vector<int> spec, int, int, double);
     Network();
+    ~Network();
 
     std::vector<Layer *> layers;
     double learningRate;
