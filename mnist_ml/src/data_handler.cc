@@ -53,6 +53,10 @@ void data_handler::read_feature_vector(std::string path){
     }
     // printf("flagsdadcxasc\n");
     fclose(f);
+    feature_vector_size = data_array->at(0)->get_feature_vector_size();
+    normalize();
+    printf("Successfully read %lu data entries.\n", data_array->size());
+    printf("The Feature Vector Size is: %d\n", feature_vector_size);
 }
 
 void data_handler::read_feature_labels(std::string path){
@@ -99,9 +103,9 @@ void data_handler::split_data(){
     int test_size = this->data_array->size() * TEST_SET_PERCENT;
     int validation_size = this->data_array->size() * VALIDATION_SET_PERCENT;
     
-    auto rng = std::default_random_engine{};
+    // auto rng = std::default_random_engine{};
     // auto head = data_array->at(0);
-    std::shuffle(data_array->begin(),data_array->end(), rng);
+    std::random_shuffle(data_array->begin(),data_array->end());
     // auto head_shuffle = data_array->at(0);
     
     // if(head_shuffle != head){
@@ -159,16 +163,32 @@ void data_handler::split_data(){
 
 void data_handler::count_classes(){
     int count = 0;
-    for( size_t i=0; i< data_array->size(); i++){
+    // printf("data array size %lu\n",data_array->size());
+    for(size_t i=0; i< data_array->size(); i++){
+        // if(i == data_array->size() - 1){
+        //     printf("%zu\n",i);
+        // }
         if(class_map.find(data_array->at(i)->get_label()) == class_map.end()){
+            // printf("count %d\n",count);
             class_map[data_array->at(i)->get_label()] = count;
             data_array->at(i)->set_enumerated_label(count);
             count++;
         }
     }
-    num_classes = count;
-    printf("Successfully Extraced %lu Unique class", class_map.size());
+    // printf("ssss\n");
+    this->num_classes = count;
+    for(data* data : *data_array){
+        data->set_class_vector(count);
+    }
+    printf("Successfully Extraced %lu Unique class\n", class_map.size());
+}
 
+int data_handler::get_feature_vector_size(){
+    return feature_vector_size;
+}
+
+int data_handler::get_num_classes(){
+    return num_classes;
 }
 
 std::vector<data *> * data_handler::get_training_data(){
@@ -193,9 +213,9 @@ uint32_t data_handler::convert_to_little_endian(const unsigned char * bytes){
 }
 
 void data_handler::normalize(){
-    std::vector<uint8_t> min, max;
+    std::vector<double> min, max;
     //initialize min and max
-    auto item = this->data_array->at(0);
+    data* item = this->data_array->at(0);
     for(int i = 0; i < item->get_feature_vector_size(); i++){
         min.push_back(item->get_feature_vector()->at(i));
         max.push_back(item->get_feature_vector()->at(i));
@@ -203,7 +223,7 @@ void data_handler::normalize(){
 
     for(auto item: *this->data_array){
         for(int j = 0; j < item->get_feature_vector_size(); j++){
-            uint8_t t = item->get_feature_vector()->at(j);
+            double t = (double)item->get_feature_vector()->at(j);
             if(t > max.at(j)){
                 max.at(j) = t;
             }
@@ -215,7 +235,7 @@ void data_handler::normalize(){
     
     for(auto item: *this->data_array){
         item->set_normalized_feature_vector(new std::vector<double>());
-        item->set_class_vector(item->get_label());
+        item->set_class_vector(this->num_classes);
         for(int j = 0; j< item->get_feature_vector_size(); j++){
             if(max[j] - min[j] == 0) item->get_normalized_feature_vector()->push_back(0.0);
             else{
@@ -225,6 +245,34 @@ void data_handler::normalize(){
         }
     }
 }
+
+void data_handler::print(){
+    printf("Training Data:\n");
+    for(auto data: *training_data){
+        for(auto value: *data->get_normalized_feature_vector()){
+            printf("%.3f,", value);
+        }
+        printf("->  %d\n", data->get_label());
+    }
+
+    printf("Validation Data:\n");
+    for(auto data: *validation_data){
+        for(auto value: *data->get_normalized_feature_vector()){
+            printf("%.3f,", value);
+        }
+        printf("->  %d\n", data->get_label());
+    }
+
+    printf("Testing Data:\n");
+    for(auto data: *test_data){
+        for(auto value: *data->get_normalized_feature_vector()){
+            printf("%.3f,", value);
+        }
+        printf("->  %d\n", data->get_label());
+    }
+
+}
+
 
 int main(){
     data_handler *dh =  new data_handler();

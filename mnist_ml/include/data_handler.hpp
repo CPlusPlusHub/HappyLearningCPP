@@ -42,6 +42,12 @@ class data_handler{
     std::vector<data *> * get_training_data();
     std::vector<data *> * get_test_data();
     std::vector<data *> * get_validation_data();
+    int get_num_classes();
+    int get_feature_vector_size();
+
+    void print();
+
+
 };
 
 #endif
